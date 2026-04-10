@@ -92,6 +92,7 @@ public class InventoryViewLogic implements Serializable {
     }
 
     public void saveProduct(Product product) {
+        System.out.println("Saving product: " + product);
         final boolean newProduct = product.isNewProduct();
         view.clearSelection();
         view.updateProduct(product);

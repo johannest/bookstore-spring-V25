@@ -189,6 +189,7 @@ public class ProductForm extends Div {
     }
 
     public void editProduct(Product product) {
+        System.out.println("Editing product " + product);
         if (product == null) {
             product = new Product();
         }

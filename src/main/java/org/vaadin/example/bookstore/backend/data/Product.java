@@ -99,4 +99,12 @@ public class Product implements Serializable {
 
         return Objects.hash(id);
     }
+
+    @Override
+    public String toString() {
+        return "" +
+               "id=" + id +
+               ", productName='" + productName + '\'' +
+               '}';
+    }
 }

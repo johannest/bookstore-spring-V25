@@ -21,6 +21,17 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
         <vaadin.version>25.2-SNAPSHOT</vaadin.version>
+
+        <app.port>8081</app.port>
+        <management.port>8082</management.port>
+        <proxy.port>6000</proxy.port>
+        <k6.vus>1</k6.vus>
+        <k6.duration>5s</k6.duration>
+        <k6.testDir>${project.build.directory}/k6/tests</k6.testDir>
+        <!-- Enable Vaadin-specific metrics collection (requires VaadinActuator in demo app) -->
+        <k6.collectVaadinMetrics>true</k6.collectVaadinMetrics>
+        <k6.skipRecord>false</k6.skipRecord>
+        <k6.skipRun>false</k6.skipRun>
     </properties>
 
     <dependencyManagement>
@@ -60,6 +71,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jetty</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <!-- Required by Vaadin 25 for metrics; no longer transitively included in Spring Boot 4 -->
@@ -161,6 +176,84 @@
     </build>
 
     <profiles>
+    <profile>
+            <id>local</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- K6 TestBench Converter Plugin -->
+                    <plugin>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>testbench-converter-plugin</artifactId>
+                        <version>10.2.0-alpha1</version>
+                        <executions>
+                            <!-- Start and wait for the demo app -->
+                            <execution>
+                                <id>start-demo-app</id>
+                                <goals>
+                                    <goal>start-server</goal>
+                                </goals>
+                                <configuration>
+                                    <serverJar>target/${project.build.finalName}.jar</serverJar>
+                                    <serverPort>${app.port}</serverPort>
+                                    <managementPort>${management.port}</managementPort>
+                                </configuration>
+                            </execution>
+
+                            <!-- Record TestBench scenarios -->
+                            <execution>
+                                <id>record-scenarios</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>record</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${k6.skipRecord}</skip>
+                                    <testClasses>
+                                        <testClass>SampleCrudViewIT</testClass>
+                                    </testClasses>
+                                    <proxyPort>${proxy.port}</proxyPort>
+                                    <appPort>${app.port}</appPort>
+                                    <testWorkDir>${project.basedir}</testWorkDir>
+                                    <harDir>${project.build.directory}</harDir>
+                                    <outputDir>${project.build.directory}/k6/tests</outputDir>
+                                </configuration>
+                            </execution>
+
+                            <!-- Run k6 load tests -->
+                            <execution>
+                                <id>run-load-tests</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${k6.skipRun}</skip>
+                                    <testDir>${k6.testDir}</testDir>
+                                    <virtualUsers>${k6.vus}</virtualUsers>
+                                    <duration>${k6.duration}</duration>
+                                    <appPort>${app.port}</appPort>
+                                    <managementPort>${management.port}</managementPort>
+                                    <combineScenarios>${k6.combineScenarios}</combineScenarios>
+                                    <scenarioWeights>${k6.scenarioWeights}</scenarioWeights>
+                                    <collectVaadinMetrics>${k6.collectVaadinMetrics}</collectVaadinMetrics>
+                                </configuration>
+                            </execution>
+
+                            <!-- Stop the demo app -->
+                            <execution>
+                                <id>stop-demo-app</id>
+                                <goals>
+                                    <goal>stop-server</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>it</id>
             <build>

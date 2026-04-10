@@ -1,20 +1,14 @@
 package org.vaadin.example.crud;
 
-import java.time.Duration;
-import java.util.stream.IntStream;
-
-import com.vaadin.testbench.loadtest.LoadTestItHelper;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
-import org.openqa.selenium.By;
-
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.junit.Assert;
+import org.junit.Test;
 import org.vaadin.example.AbstractViewTest;
 import org.vaadin.example.MainLayoutElement;
 import org.vaadin.example.authentication.LoginFormElement;
+
+import java.util.stream.IntStream;
 
 public class SampleCrudViewIT extends AbstractViewTest {
 
@@ -65,8 +59,7 @@ public class SampleCrudViewIT extends AbstractViewTest {
     @Test
     public void adminCreatesNewProduct_productIsAvailableInGird() throws InterruptedException {
         // given authenticated as an admin
-        LoginFormElement first = $(LoginFormElement.class).waitForFirst(7);
-        first.login("admin", "admin");
+        $(LoginFormElement.class).first().login("admin", "admin");
 
         // given "Inventory" is selected from the sidebar menu
         final MainLayoutElement mainElem = $(MainLayoutElement.class).first();

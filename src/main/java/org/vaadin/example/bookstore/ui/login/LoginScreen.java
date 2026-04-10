@@ -35,6 +35,7 @@ public class LoginScreen extends FlexLayout implements BeforeEnterObserver {
     private String redirectPath;
 
     public LoginScreen() {
+        System.out.println("LoginScreen");
         accessControl = AccessControlFactory.getInstance().createAccessControl();
         buildUI();
     }
@@ -81,6 +82,7 @@ public class LoginScreen extends FlexLayout implements BeforeEnterObserver {
     }
 
     private void login(LoginForm.LoginEvent event) {
+        System.out.println("login");
         if (accessControl.signIn(event.getUsername(), event.getPassword())) {
             UI ui = getUI().get();
             ApplicationRouteRegistry registry = ApplicationRouteRegistry.getInstance(
@@ -92,7 +94,9 @@ public class LoginScreen extends FlexLayout implements BeforeEnterObserver {
             } else {
                 ui.navigate("");
             }
+            System.out.println("login complete");
         } else {
+            System.out.println("login failed");
             event.getSource().setError(true);
         }
     }

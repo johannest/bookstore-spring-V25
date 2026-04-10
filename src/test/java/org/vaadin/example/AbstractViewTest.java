@@ -1,18 +1,12 @@
 package org.vaadin.example;
 
+import com.vaadin.flow.testutil.ChromeBrowserTest;
 import com.vaadin.testbench.ScreenshotOnFailureRule;
+import com.vaadin.testbench.loadtest.LoadTestItHelper;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-
-import com.vaadin.flow.component.combobox.testbench.ComboBoxElement;
-import com.vaadin.flow.component.datepicker.testbench.DatePickerElement;
-import com.vaadin.flow.testutil.ChromeBrowserTest;
-import com.vaadin.testbench.TestBenchElement;
-import com.vaadin.testbench.loadtest.LoadTestItHelper;
 
 /**
  * Base class for ITs
@@ -29,7 +23,7 @@ import com.vaadin.testbench.loadtest.LoadTestItHelper;
  * <a href="https://vaadin.com/docs/testbench/testbench-overview.html">Vaadin TestBench</a>.
  */
 public abstract class AbstractViewTest extends ChromeBrowserTest {
-    private static final int SERVER_PORT = 8080;
+    private static final int SERVER_PORT = 8081;
 
     private final String route;
     private final By rootSelector;
@@ -47,11 +41,32 @@ public abstract class AbstractViewTest extends ChromeBrowserTest {
         this.rootSelector = rootSelector;
     }
 
-    @BeforeEach
-    public void open() {
-        String url = getURL(route);
-        System.err.println("Opening " + url);
-        setDriver(LoadTestItHelper.openWithProxy(getDriver(), url));
+    @Before
+    @Override
+    public void setup() throws Exception {
+        super.setup();
+        testBench().resizeViewPortTo(1000, 1000);
+        
+        setDriver(LoadTestItHelper.openWithProxy( getDriver(), getTestURL()));
+    }
+
+    @Override
+    protected String getTestPath() {
+        return "/";
+    }
+
+    @Override
+    protected int getDeploymentPort() {
+        return Integer.parseInt(System.getProperty("app.port", "8081"));
+    }
+
+    @Override
+    protected void open() {
+        doOpen();
+    }
+
+    protected void doOpen() {
+        super.open();
     }
 
 //    @Before

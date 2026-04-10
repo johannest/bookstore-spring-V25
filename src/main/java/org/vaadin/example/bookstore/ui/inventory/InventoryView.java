@@ -40,6 +40,7 @@ public class InventoryView extends HorizontalLayout
     private final ProductDataProvider dataProvider = new ProductDataProvider();
 
     public InventoryView() {
+        System.out.println("InventoryView");
         // Sets the width and the height of InventoryView to "100%".
         setSizeFull();
         final HorizontalLayout topLayout = createTopBar();
@@ -136,6 +137,7 @@ public class InventoryView extends HorizontalLayout
      */
     public void updateProduct(Product product) {
         dataProvider.save(product);
+        showNotification("Product updated");
     }
 
     /**
